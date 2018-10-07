@@ -1,4 +1,4 @@
-from Fifteen import Fifteen
+from fifteen import Fifteen
 
 f = Fifteen("start.txt", "outcome.txt")
 

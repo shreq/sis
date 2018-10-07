@@ -13,4 +13,3 @@ class Fifteen:
         for y in range(len(self.tiles)):
             for x in range(len(self.tiles[y])):
                 print(self.tiles[x][y])
-
