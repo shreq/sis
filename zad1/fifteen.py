@@ -9,7 +9,7 @@ class Fifteen:
             self.fo.truncate(0)
         else:
             self.tiles = []
-        self.neighbours = []
+        # self.neighbours = []
         self.moves = []
         self.undo = ""
 
@@ -17,9 +17,10 @@ class Fifteen:
         if not self.is_child:
             self.fo.close()
 
-    def _copy_(self, tiles, neighbours, moves, undo):
+    # def _copy_(self, tiles, neighbours, moves, undo):
+    def _copy_(self, tiles, moves, undo):
         self.tiles = tiles
-        self.neighbours = neighbours
+        # self.neighbours = neighbours
         self.moves = moves
         self.undo = undo
 
@@ -48,7 +49,7 @@ class Fifteen:
             self.tiles[y][x], self.tiles[y-1][x] = self.tiles[y-1][x], self.tiles[y][x]
             self.undo = 'd'
             if not self.is_child:
-               self.fo.write('U')
+                self.fo.write('U')
         elif d == 'd' or d == 'D':
             if y+1 > len(self.tiles):
                 raise NameError
@@ -84,23 +85,23 @@ class Fifteen:
         return success
 
     def look_around(self):                      # checks neighbourhood of blank tile and looks for possible moves
-        self.neighbours = []
+        # self.neighbours = []
         self.moves = []
         x, y = self.find(0)
-        if y-1 > 0:
-            self.neighbours.append(self.tiles[y-1][x])
+        if y > 0:
+            # self.neighbours.append(self.tiles[y-1][x])
             if self.undo != 'u':
                 self.moves.append('u')
-        if y+1 < len(self.tiles):
-            self.neighbours.append(self.tiles[y+1][x])
+        if y < len(self.tiles)-1:
+            # self.neighbours.append(self.tiles[y+1][x])
             if self.undo != 'd':
                 self.moves.append('d')
-        if x-1 > 0:
-            self.neighbours.append(self.tiles[y][x-1])
+        if x > 0:
+            # self.neighbours.append(self.tiles[y][x-1])
             if self.undo != 'l':
                 self.moves.append('l')
-        if x+1 < len(self.tiles[y]):
-            self.neighbours.append(self.tiles[y][x+1])
+        if x < len(self.tiles[y])-1:
+            # self.neighbours.append(self.tiles[y][x+1])
             if self.undo != 'r':
                 self.moves.append('r')
 
@@ -117,27 +118,31 @@ class Fifteen:
 
     def astar(self):
         loops = 0
-        while self.hamming() > 0:
-            self.look_around()
-            # self.hamming()
+        self.look_around()
+        while self.hamming() > 0 and loops < 10000:
             best_move = ""
             smallest_error = 99
-            child = Fifteen(self.fi, self.fo, True)
-            child._copy_(self.tiles, self.neighbours, self.moves, self.undo)
+            self.look_around()
 
-            for move in self.moves:
+            children = []
+            for i in range(len(self.moves)):
+                children.append(Fifteen(self.fi, self.fo, True))
+                children[i]._copy_(self.tiles, self.moves, self.undo)
+
+            for move, child in zip(self.moves, children):
                 child.move_zero(move)
                 ham = child.hamming()
                 if ham < smallest_error:
-                    best_move = move
                     smallest_error = ham
-                child.move_zero(child.undo)
-            child.__del__()
+                    best_move = move
+                # child.move_zero(child.undo)
 
-            if best_move != "":
+            if best_move != '':
                 self.move_zero(best_move)
+            else:
+                print('   l   i   p   a')
 
-            if loops % 10000 == 0:
-                print(loops)
+            # if loops % 10000 == 0:
+            print(loops)
             loops += 1
         return loops
