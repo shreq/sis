@@ -135,7 +135,8 @@ class Fifteen:
                 if ham < smallest_error:
                     smallest_error = ham
                     best_move = move
-                # child.move_zero(child.undo)
+                child.move_zero(child.undo)
+                child.__del__()
 
             if best_move != '':
                 self.move_zero(best_move)
