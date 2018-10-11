@@ -1,4 +1,4 @@
-from fifteen2 import Fifteen
+from fifteen import Fifteen
 
 f = Fifteen("start.txt", "outcome.txt", False)
 f.save2file()
