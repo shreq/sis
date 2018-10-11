@@ -1,5 +1,8 @@
+from copy import deepcopy
+
+
 class Fifteen:
-    def __init__(self, fin, fout, is_child):
+    def __init__(self, fin, fout, is_child, obj=None):
         self.is_child = is_child
         self.moves = []
         self.undo = ''
@@ -9,6 +12,8 @@ class Fifteen:
             self.tiles = [list(map(int, line.split())) for line in self.fi]
             self.fi.close()
             self.fo.truncate(0)
+        elif obj is not None:
+            self.tiles = deepcopy(obj.tiles)
         else:
             self.tiles = []
 
@@ -81,28 +86,40 @@ class Fifteen:
                     diff += 1
         return diff
 
+    def best_move(self):
+        best_move = ''
+        smallest_error = 99
+        self.look_around()
+
+        children = []
+        for i in range(len(self.moves)):
+            children.append(Fifteen(self.fi, self.fo, True, self))
+
+        for move, child in zip(self.moves, children):
+            child.swap(move)
+            ham = child.hamming()
+            if ham < smallest_error:
+                smallest_error = ham
+                best_move = move
+
+        return best_move
+
     def astar(self):
         loops = 0
-        while self.hamming() > 0:  # and loops < 10000:
-            best_move = ''
-            smallest_error = 99
-            self.look_around()
+        while self.hamming() > 0 and loops < 10000:
+            closed = []
+            open = []
+            optimal_route = 0
 
-            children = []
-            for i in range(len(self.moves)):
-                children.append(Fifteen(self.fi, self.fo, True))
-                children[i]._copy_(self.tiles, self.moves, self.undo)
+            while len(open):
+                best_move = self.best_move()
 
-            for move, child in zip(self.moves, children):
-                child.swap(move)
-                ham = child.hamming()
-                if ham < smallest_error:
-                    smallest_error = ham
-                    best_move = move
-                child.swap(child.undo)
+            # <-- NEW
+            # OLD -->
+            best = self.best_move()
 
-            if best_move != '':
-                self.swap(best_move)
+            if best != '':
+                self.swap(best)
             else:
                 print('   l   i   p   a')
 
