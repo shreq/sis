@@ -2,29 +2,29 @@ from copy import deepcopy
 
 
 class Fifteen:
-    def __init__(self, fin, fout, is_child, obj=None):
-        self.is_child = is_child
-        self.moves = []
-        self.undo = ''
-        if not is_child:
-            self.fi = open(fin, 'r', encoding='utf-8')
-            self.fo = open(fout, 'a', encoding='utf-8')
-            self.tiles = [list(map(int, line.split())) for line in self.fi]
-            self.fi.close()
-            self.fo.truncate(0)
-        elif obj is not None:
-            self.tiles = deepcopy(obj.tiles)
+
+    tiles = []
+    undo_move = ''
+    next_states = []
+    h_score = 0  # calculated using heuristic
+    g_score = 0  # equal to depth
+    f_score = 0  # sum of h_score and g_score
+    previous_moves = []
+
+    def __init__(self, fin, parent=None):
+        if parent is None:
+            fi = open(fin, 'r', encoding='utf-8')
+            self.tiles = [list(map(int, line.split())) for line in fi]
+            fi.close()
+        elif parent is not None:
+            self.tiles = deepcopy(parent.tiles)
+            self.undo_move = deepcopy(parent.undo_move)
+            self.h_score = deepcopy(parent.h_score)
+            self.g_score = deepcopy(parent.g_score)
+            self.f_score = deepcopy(parent.f_score)
+            self.previous_moves = deepcopy(parent.previous_moves)
         else:
             self.tiles = []
-
-    def __del__(self):
-        if not self.is_child:
-            self.fo.close()
-
-    def _copy_(self, tiles, moves, undo):
-        self.tiles = tiles
-        self.moves = moves
-        self.undo = undo
 
     def tiles2str(self):
         s = ''
@@ -49,31 +49,46 @@ class Fifteen:
             x, y = self.find()
         if d == 'u' and y - 1 >= 0:
             self.tiles[y][x], self.tiles[y - 1][x] = self.tiles[y - 1][x], self.tiles[y][x]
-            self.undo = 'd'
+            self.previous_moves.append('u')
+            self.undo_move = 'd'
         elif d == 'd' and y + 1 <= len(self.tiles) - 1:
             self.tiles[y][x], self.tiles[y + 1][x] = self.tiles[y + 1][x], self.tiles[y][x]
-            self.undo = 'u'
+            self.previous_moves.append('d')
+            self.undo_move = 'u'
         elif d == 'l' and x - 1 >= 0:
             self.tiles[y][x], self.tiles[y][x - 1] = self.tiles[y][x - 1], self.tiles[y][x]
-            self.undo = 'r'
+            self.previous_moves.append('l')
+            self.undo_move = 'r'
         elif d == 'r' and x + 1 <= len(self.tiles[y]) - 1:
             self.tiles[y][x], self.tiles[y][x + 1] = self.tiles[y][x + 1], self.tiles[y][x]
-            self.undo = 'l'
+            self.previous_moves.append('r')
+            self.undo_move = 'l'
         else:
             raise NameError
-        self.look_around()
 
-    def look_around(self):
-        self.moves = []
+    def generate_next_states(self):
+        self.next_states = []
         x, y = self.find()
-        if y - 1 >= 0 and self.undo != 'u':
-            self.moves.append('u')
-        if y + 1 <= len(self.tiles) - 1 and self.undo != 'd':
-            self.moves.append('d')
-        if x - 1 >= 0 and self.undo != 'l':
-            self.moves.append('l')
-        if x + 1 <= len(self.tiles[y]) - 1 and self.undo != 'r':
-            self.moves.append('r')
+        if y - 1 >= 0 and self.undo_move != 'u':
+            child = Fifteen(None, self)
+            child.swap('u')
+            child.g_score = len(child.previous_moves)
+            self.next_states.append(child)
+        if y + 1 <= len(self.tiles) - 1 and self.undo_move != 'd':
+            child = Fifteen(None, self)
+            child.swap('d')
+            child.g_score = len(child.previous_moves)
+            self.next_states.append(child)
+        if x - 1 >= 0 and self.undo_move != 'l':
+            child = Fifteen(None, self)
+            child.swap('l')
+            child.g_score = len(child.previous_moves)
+            self.next_states.append(child)
+        if x + 1 <= len(self.tiles[y]) - 1 and self.undo_move != 'r':
+            child = Fifteen(None, self)
+            child.swap('r')
+            child.g_score = len(child.previous_moves)
+            self.next_states.append(child)
 
     def hamming(self):
         diff = 0
@@ -86,43 +101,22 @@ class Fifteen:
                     diff += 1
         return diff
 
-    def best_move(self):
-        best_move = ''
-        smallest_error = 99
-        self.look_around()
-
-        children = []
-        for i in range(len(self.moves)):
-            children.append(Fifteen(self.fi, self.fo, True, self))
-
-        for move, child in zip(self.moves, children):
-            child.swap(move)
-            ham = child.hamming()
-            if ham < smallest_error:
-                smallest_error = ham
-                best_move = move
-
-        return best_move
-
     def astar(self):
-        loops = 0
-        while self.hamming() > 0 and loops < 10000:
-            closed = []
-            open = []
-            optimal_route = 0
 
-            while len(open):
-                best_move = self.best_move()
+        queue = [self]
 
-            # <-- NEW
-            # OLD -->
-            best = self.best_move()
+        while len(queue) > 0:
+            current_state = queue.pop(0)
 
-            if best != '':
-                self.swap(best)
-            else:
-                print('   l   i   p   a')
+            if current_state.hamming() == 0:
+                print(current_state.tiles)
+                return
+            current_state.generate_next_states()
+            for state in current_state.next_states:
+                state.h_score = state.hamming()
+                state.f_score = state.h_score + state.g_score
+                queue.append(state)
+                queue.sort(key=lambda x: x.f_score, reverse=False)
 
-            print(loops)
-            loops += 1
-        return loops
+        print(-1)
+        return
