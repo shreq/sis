@@ -3,6 +3,7 @@ from copy import deepcopy
 
 class Fifteen:
 
+    heur = ''
     tiles = []
     undo_move = ''
     next_states = []
@@ -11,12 +12,14 @@ class Fifteen:
     f_score = 0  # sum of h_score and g_score
     previous_moves = []
 
-    def __init__(self, fin, parent=None):
+    def __init__(self, heur, fin, parent=None):
         if parent is None:
+            self.heur = heur
             fi = open(fin, 'r', encoding='utf-8')
             self.tiles = [list(map(int, line.split())) for line in fi]
             fi.close()
         elif parent is not None:
+            self.heur = deepcopy(parent.heur)
             self.tiles = deepcopy(parent.tiles)
             self.undo_move = deepcopy(parent.undo_move)
             self.h_score = deepcopy(parent.h_score)
@@ -70,25 +73,30 @@ class Fifteen:
         self.next_states = []
         x, y = self.find()
         if y - 1 >= 0 and self.undo_move != 'u':
-            child = Fifteen(None, self)
+            child = Fifteen(None, None, self)
             child.swap('u')
             child.g_score = len(child.previous_moves)
             self.next_states.append(child)
         if y + 1 <= len(self.tiles) - 1 and self.undo_move != 'd':
-            child = Fifteen(None, self)
+            child = Fifteen(None, None, self)
             child.swap('d')
             child.g_score = len(child.previous_moves)
             self.next_states.append(child)
         if x - 1 >= 0 and self.undo_move != 'l':
-            child = Fifteen(None, self)
+            child = Fifteen(None, None, self)
             child.swap('l')
             child.g_score = len(child.previous_moves)
             self.next_states.append(child)
         if x + 1 <= len(self.tiles[y]) - 1 and self.undo_move != 'r':
-            child = Fifteen(None, self)
+            child = Fifteen(None, None, self)
             child.swap('r')
             child.g_score = len(child.previous_moves)
             self.next_states.append(child)
+
+    def heuristic(self):
+        if self.heur == 'hamm':
+            return self.hamming()
+        return  self.manhattan()
 
     def hamming(self):
         diff = 0
@@ -101,6 +109,20 @@ class Fifteen:
                     diff += 1
         return diff
 
+    def manhattan(self):
+        score = 0
+        value = 1
+        for y in range(len(self.tiles)):
+            for x in range(len(self.tiles[y])):
+                if value == 16:
+                    value = 0
+                x_real, y_real = self.find(value)
+                dx = abs(x - x_real)
+                dy = abs(y - y_real)
+                score += dx + dy
+                value += 1
+        return score
+
     def astar(self):
 
         queue = [self]
@@ -108,12 +130,12 @@ class Fifteen:
         while len(queue) > 0:
             current_state = queue.pop(0)
 
-            if current_state.hamming() == 0:
+            if current_state.heuristic() == 0:
                 print(current_state.tiles)
                 return
             current_state.generate_next_states()
             for state in current_state.next_states:
-                state.h_score = state.hamming()
+                state.h_score = state.heuristic()
                 state.f_score = state.h_score + state.g_score
                 queue.append(state)
                 queue.sort(key=lambda x: x.f_score, reverse=False)
