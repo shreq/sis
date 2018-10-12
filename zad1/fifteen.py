@@ -6,9 +6,8 @@ class Fifteen:
     heur = ''
     tiles = []
     undo_move = ''
-    next_states = []
     h_score = 0  # calculated using heuristic
-    depth = 0  # equal to depth
+    depth = 0
     f_score = 0  # sum of h_score and depth
     previous_moves = []
 
@@ -24,8 +23,6 @@ class Fifteen:
             self.undo_move = deepcopy(parent.undo_move)
             self.depth = deepcopy(parent.depth)
             self.previous_moves = deepcopy(parent.previous_moves)
-        else:
-            self.tiles = []
 
     def tiles2str(self):
         s = ''
@@ -68,28 +65,29 @@ class Fifteen:
             raise NameError
 
     def generate_next_states(self):
-        self.next_states = []
+        next_states = []
         x, y = self.find()
         if y - 1 >= 0 and self.undo_move != 'u':
             child = Fifteen(None, None, self)
             child.swap('u')
             child.depth = len(child.previous_moves)
-            self.next_states.append(child)
+            next_states.append(child)
         if y + 1 <= len(self.tiles) - 1 and self.undo_move != 'd':
             child = Fifteen(None, None, self)
             child.swap('d')
             child.depth = len(child.previous_moves)
-            self.next_states.append(child)
+            next_states.append(child)
         if x - 1 >= 0 and self.undo_move != 'l':
             child = Fifteen(None, None, self)
             child.swap('l')
             child.depth = len(child.previous_moves)
-            self.next_states.append(child)
+            next_states.append(child)
         if x + 1 <= len(self.tiles[y]) - 1 and self.undo_move != 'r':
             child = Fifteen(None, None, self)
             child.swap('r')
             child.depth = len(child.previous_moves)
-            self.next_states.append(child)
+            next_states.append(child)
+        return next_states
 
     def heuristic(self):
         if self.heur == 'hamm':
@@ -121,8 +119,8 @@ class Fifteen:
                 value += 1
         return score
 
-    def is_contained(self, list, obj):
-        for element in list:
+    def is_contained(self, container, obj):
+        for element in container:
             if element.tiles == obj.tiles:
                 return True
             return False
@@ -138,16 +136,15 @@ class Fifteen:
             processed.append(current_state)
             if current_state.heuristic() == 0:
                 print(current_state.tiles)
+                print(current_state.previous_moves)
                 return
-            if current_state.depth < 200:
-                current_state.generate_next_states()
-                for state in current_state.next_states:
+            if current_state.depth < 64:
+                for state in current_state.generate_next_states():
                     if self.is_contained(processed, state):
                         continue
                     state.h_score = state.heuristic()
                     state.f_score = state.h_score + state.depth
                     queue.append(state)
                 queue.sort(key=lambda x: x.f_score, reverse=False)
-        print(current_state.tiles)
         print(-1)
         return
