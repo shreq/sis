@@ -8,7 +8,6 @@ class Fifteen:
     undo_move = ''
     h_score = 0  # calculated using heuristic
     depth = 0
-    f_score = 0  # sum of h_score and depth
     previous_moves = []
 
     def __init__(self, heur, fin, parent=None):
@@ -21,19 +20,8 @@ class Fifteen:
             self.heur = deepcopy(parent.heur)
             self.tiles = deepcopy(parent.tiles)
             self.undo_move = deepcopy(parent.undo_move)
-            self.depth = deepcopy(parent.depth)
+            self.depth = deepcopy(parent.depth) + 1
             self.previous_moves = deepcopy(parent.previous_moves)
-
-    def tiles2str(self):
-        s = ''
-        for y in range(len(self.tiles)):
-            for x in range(len(self.tiles[y])):
-                s += str(self.tiles[y][x]) + ' '
-            s += '\n'
-        return s
-
-    def save2file(self):
-        self.fo.write(self.tiles2str())
 
     def find(self, tile=0):
         for y in range(len(self.tiles)):
@@ -42,22 +30,21 @@ class Fifteen:
                     return x, y
         raise NameError
 
-    def swap(self, d, x=-1, y=-1):
-        if x == -1 or y == -1:
-            x, y = self.find()
-        if d == 'u' and y - 1 >= 0:
+    def move_tile(self, direction):
+        x, y = self.find()
+        if direction == 'u':
             self.tiles[y][x], self.tiles[y - 1][x] = self.tiles[y - 1][x], self.tiles[y][x]
             self.previous_moves.append('u')
             self.undo_move = 'd'
-        elif d == 'd' and y + 1 <= len(self.tiles) - 1:
+        elif direction == 'd':
             self.tiles[y][x], self.tiles[y + 1][x] = self.tiles[y + 1][x], self.tiles[y][x]
             self.previous_moves.append('d')
             self.undo_move = 'u'
-        elif d == 'l' and x - 1 >= 0:
+        elif direction == 'l':
             self.tiles[y][x], self.tiles[y][x - 1] = self.tiles[y][x - 1], self.tiles[y][x]
             self.previous_moves.append('l')
             self.undo_move = 'r'
-        elif d == 'r' and x + 1 <= len(self.tiles[y]) - 1:
+        elif direction == 'r':
             self.tiles[y][x], self.tiles[y][x + 1] = self.tiles[y][x + 1], self.tiles[y][x]
             self.previous_moves.append('r')
             self.undo_move = 'l'
@@ -67,25 +54,21 @@ class Fifteen:
     def generate_next_states(self):
         next_states = []
         x, y = self.find()
-        if y - 1 >= 0 and self.undo_move != 'u':
+        if y != 0 and self.undo_move != 'u':
             child = Fifteen(None, None, self)
-            child.swap('u')
-            child.depth = len(child.previous_moves)
+            child.move_tile('u')
             next_states.append(child)
-        if y + 1 <= len(self.tiles) - 1 and self.undo_move != 'd':
+        if y != len(self.tiles) - 1 and self.undo_move != 'd':
             child = Fifteen(None, None, self)
-            child.swap('d')
-            child.depth = len(child.previous_moves)
+            child.move_tile('d')
             next_states.append(child)
-        if x - 1 >= 0 and self.undo_move != 'l':
+        if x != 0 and self.undo_move != 'l':
             child = Fifteen(None, None, self)
-            child.swap('l')
-            child.depth = len(child.previous_moves)
+            child.move_tile('l')
             next_states.append(child)
-        if x + 1 <= len(self.tiles[y]) - 1 and self.undo_move != 'r':
+        if x != len(self.tiles[y]) - 1 and self.undo_move != 'r':
             child = Fifteen(None, None, self)
-            child.swap('r')
-            child.depth = len(child.previous_moves)
+            child.move_tile('r')
             next_states.append(child)
         return next_states
 
@@ -119,32 +102,23 @@ class Fifteen:
                 value += 1
         return score
 
-    def is_contained(self, container, obj):
-        for element in container:
-            if element.tiles == obj.tiles:
-                return True
-            return False
-
     def astar(self):
 
         queue = [self]
-        processed = []
-        loops = 0
-        while len(queue) > 0 and loops < 20000:
-            loops += 1
+        closed_set = {}
+        while len(queue) > 0:
             current_state = queue.pop(0)
-            processed.append(current_state)
+            closed_set[repr(current_state.tiles)] = current_state
             if current_state.heuristic() == 0:
                 print(current_state.tiles)
                 print(current_state.previous_moves)
+                print(len(current_state.previous_moves))
                 return
-            if current_state.depth < 64:
-                for state in current_state.generate_next_states():
-                    if self.is_contained(processed, state):
-                        continue
-                    state.h_score = state.heuristic()
-                    state.f_score = state.h_score + state.depth
-                    queue.append(state)
-                queue.sort(key=lambda x: x.f_score, reverse=False)
+            for state in current_state.generate_next_states():
+                if repr(state.tiles) in closed_set:
+                    continue
+                state.h_score = state.heuristic()
+                queue.append(state)
+            queue.sort(key=lambda x: x.h_score, reverse=False)
         print(-1)
         return
