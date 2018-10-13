@@ -1,6 +1,4 @@
 from fifteen import Fifteen
 
-f = Fifteen('hamm', "start.txt")
+f = Fifteen('manh', "start.txt")
 f.astar()
-
-

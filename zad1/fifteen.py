@@ -8,6 +8,7 @@ class Fifteen:
     undo_move = ''
     h_score = 0  # calculated using heuristic
     depth = 0
+    f_score = 0  # sum of h_score and depth
     previous_moves = []
 
     def __init__(self, heur, fin, parent=None):
