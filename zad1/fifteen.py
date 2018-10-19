@@ -2,6 +2,14 @@ from copy import deepcopy
 import heapq
 
 
+def is_contained(container, obj):
+    for element in container:
+        if element.tiles == obj.tiles:
+            if element.depth <= obj.depth:
+                return True
+    return False
+
+
 class Fifteen:
 
     heur = ''
@@ -128,9 +136,8 @@ class Fifteen:
 
         for y in range(len(self.tiles)):
             for x in range(len(self.tiles[y])):
-
                 if value == 16:
-                    value = 0
+                    continue
                 x_real, y_real = self.find(value)
                 dx = abs(x - x_real)
                 dy = abs(y - y_real)
@@ -149,16 +156,14 @@ class Fifteen:
             closed_set[repr(current_state.tiles)] = current_state
 
             if current_state.heuristic() == 0:
-                print(current_state.tiles)
-                print(current_state.previous_moves)
-                print(len(current_state.previous_moves))
-                return
-            for state in current_state.generate_next_states():
-                if repr(state.tiles) in closed_set:
-                    continue
-                state.h_score = state.heuristic()
-                state.f_score = state.h_score + state.depth
-                heapq.heappush(open_set, state)
+                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
+            if current_state.depth < 200:
+                for state in current_state.generate_next_states():
+                    if repr(state.tiles) in closed_set:
+                        continue
+                    state.h_score = state.heuristic()
+                    state.f_score = state.h_score + state.depth
+                    heapq.heappush(open_set, state)
 
         print(-1)
         return
