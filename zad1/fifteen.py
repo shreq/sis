@@ -1,4 +1,5 @@
 from copy import deepcopy
+import heapq
 
 
 class Fifteen:
@@ -27,6 +28,30 @@ class Fifteen:
             self.previous_moves = deepcopy(parent.previous_moves)
             self.zero_x = deepcopy(parent.zero_x)
             self.zero_y = deepcopy(parent.zero_y)
+
+    def __eq__(self, other):
+        return self.f_score == other.f_score
+
+    def __ne__(self, other):
+        return self.f_score != other.f_score
+
+    def __lt__(self, other):
+        return self.f_score < other.f_score
+
+    def __gt__(self, other):
+        return self.f_score > other.f_score
+
+    def __le__(self, other):
+        return self.f_score <= other.f_score
+
+    def __ge__(self, other):
+        return self.f_score >= other.f_score
+
+    def __str__(self):
+        return str(self.board)
+
+    def __hash__(self):
+        return hash(str(self))
 
     def find(self, tile=0):
         for y in range(len(self.tiles)):
@@ -109,46 +134,20 @@ class Fifteen:
                 x_real, y_real = self.find(value)
                 dx = abs(x - x_real)
                 dy = abs(y - y_real)
-                #print("dx + dy for {}: {}".format(value, dx+dy))
                 score += dx + dy
                 value += 1
-        #print("Score:{}".format(score))
         return score
-
-
-    def PrintState(self):
-        for y in range(len(self.tiles)):
-            for x in range(len(self.tiles[y])):
-                cellValue = self.tiles[y][x]
-                print(cellValue, end=" ")
-            print("")
-
-
-    def __eq__(self, other):
-        return (self.tiles == other.tiles
-                and self.h_score == other.h_score
-                and self.depth == other.depth)
 
     def astar(self):
 
-        queue = [self]
+        open_set = []
         closed_set = {}
-        while len(queue) > 0:
+        heapq.heappush(open_set, self)
+        while len(open_set) > 0:
 
-            print("---")
-            print("---")
-
-            current_state = queue.pop(0)
-            print("current state")
-            #print(current_state.tiles)
-            #print(repr(current_state.tiles))
-            current_state.PrintState()
-            print("current scores")
-            print("heuristic:{}".format(current_state.heuristic()))
-            print("depth:{}".format(current_state.depth))
-            print("total:{}".format(current_state.heuristic() + current_state.depth))
-
+            current_state = heapq.heappop(open_set)
             closed_set[repr(current_state.tiles)] = current_state
+
             if current_state.heuristic() == 0:
                 print(current_state.tiles)
                 print(current_state.previous_moves)
@@ -157,11 +156,9 @@ class Fifteen:
             for state in current_state.generate_next_states():
                 if repr(state.tiles) in closed_set:
                     continue
-
                 state.h_score = state.heuristic()
-                queue.append(state)
-            queue.sort(key=lambda x: (x.h_score + x.depth), reverse=False)
-
+                state.f_score = state.h_score + state.depth
+                heapq.heappush(open_set, state)
 
         print(-1)
         return
