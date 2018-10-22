@@ -11,12 +11,12 @@ def is_contained(container, obj):
 
 
 class Fifteen:
-
     heur = ''
     tiles = []
     undo_move = ''
-    h_score = 0  # calculated using heuristic
+    h_score = None  # calculated using heuristic
     depth = 0
+    f_score = None
     previous_moves = []
     zero_x = 0
     zero_y = 0
