@@ -2,6 +2,7 @@ from copy import deepcopy
 from collections import deque
 import heapq
 
+
 class Fifteen:
     heur = ''
     tiles = []
@@ -48,10 +49,24 @@ class Fifteen:
         return self.f_score >= other.f_score
 
     def __str__(self):
-        return str(self.board)
+        return str(self.tiles)
 
     def __hash__(self):
         return hash(str(self))
+
+    def tiles2str(self):
+        s = ''
+        for y in range(len(self.tiles)):
+            for x in range(len(self.tiles[y])):
+                s += str(self.tiles[y][x]) + ' '
+            s += '\n'
+        return s
+
+    def path2str(self):
+        s = ''
+        for step in self.previous_moves:
+            s += str(step).upper()
+        return s
 
     def find(self, tile=0):
         for y in range(len(self.tiles)):
@@ -91,6 +106,7 @@ class Fifteen:
         next_states = []
         x, y = self.zero_x, self.zero_y
         for direction in priority:
+            direction = direction.upper()
             if direction == 'U' and y != 0 and self.undo_move != 'u':
                 child = Fifteen(None, None, self)
                 child.move_tile('u')
@@ -141,61 +157,72 @@ class Fifteen:
         return score
 
     def astar(self):
-
         open_set = []
         closed_set = {}
         heapq.heappush(open_set, self)
-        while len(open_set) > 0:
+        visited = 1
+        processed = 0
+        max_depth = 0
 
+        while open_set:
             current_state = heapq.heappop(open_set)
+            processed += 1
+            if current_state.depth > max_depth:
+                max_depth = current_state.depth
             closed_set[repr(current_state.tiles)] = current_state
 
             if current_state.heuristic() == 0:
-                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
-
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
+                       current_state.tiles2str()
             for state in current_state.generate_next_states():
                 if repr(state.tiles) in closed_set:
                     continue
                 state.h_score = state.heuristic()
                 state.f_score = state.h_score + state.depth
                 heapq.heappush(open_set, state)
-
+                visited += 1
         print(-1)
         return
 
     def bfs(self, priority):
-
         dq = deque([self])
+        visited = 1
+        processed = 0
+        max_depth = 0
 
-        while len(dq) > 0:
-
+        while dq:
             current_state = dq.popleft()
+            processed += 1
+            if current_state.depth > max_depth:
+                max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
-
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
+                       current_state.tiles2str()
             for state in current_state.generate_next_states(priority):
                 dq.append(state)
-
+                visited += 1
         print(-1)
         return
 
     def dfs(self, priority):
-
         stack = [self]
+        visited = 1
+        processed = 0
+        max_depth = 0
 
-        while len(stack) > 0:
-
+        while stack:
             current_state = stack.pop()
+            processed += 1
+            if current_state.depth > max_depth:
+                max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
+                       current_state.tiles2str()
             if current_state.depth < 20:
                 for state in current_state.generate_next_states(priority):
                     stack.append(state)
-
+                    visited += 1
         print(-1)
         return
-
-
-
