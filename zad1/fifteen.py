@@ -1,33 +1,24 @@
 from copy import deepcopy
+from collections import deque
 import heapq
-
-
-def is_contained(container, obj):
-    for element in container:
-        if element.tiles == obj.tiles:
-            if element.depth <= obj.depth:
-                return True
-    return False
-
 
 class Fifteen:
     heur = ''
     tiles = []
-    undo_move = ''
+    undo_move = ''  # used to avoid getting stuck in a back and forth loop
     h_score = None  # calculated using heuristic
-    depth = 0
-    f_score = None
+    depth = 0       # amount of moves
+    f_score = None  # h_score + depth
     previous_moves = []
     zero_x = 0
     zero_y = 0
 
-    def __init__(self, heur, fin, parent=None):
+    def __init__(self, fin, heur = 'hamm', parent=None):
         if parent is None:
             self.heur = heur
-            fi = open(fin, 'r', encoding='utf-8')
-            self.tiles = [list(map(int, line.split())) for line in fi]
+            with open(fin, 'r', encoding='utf-8') as fi:
+                self.tiles = [list(map(int, line.split())) for line in fi]
             self.zero_x, self.zero_y = self.find()
-            fi.close()
         elif parent is not None:
             self.heur = deepcopy(parent.heur)
             self.tiles = deepcopy(parent.tiles)
@@ -93,25 +84,26 @@ class Fifteen:
         else:
             raise NameError
 
-    def generate_next_states(self):
+    def generate_next_states(self, priority = ['u', 'd', 'l', 'r']):
         next_states = []
         x, y = self.zero_x, self.zero_y
-        if y != 0 and self.undo_move != 'u':
-            child = Fifteen(None, None, self)
-            child.move_tile('u')
-            next_states.append(child)
-        if y != len(self.tiles) - 1 and self.undo_move != 'd':
-            child = Fifteen(None, None, self)
-            child.move_tile('d')
-            next_states.append(child)
-        if x != 0 and self.undo_move != 'l':
-            child = Fifteen(None, None, self)
-            child.move_tile('l')
-            next_states.append(child)
-        if x != len(self.tiles[y]) - 1 and self.undo_move != 'r':
-            child = Fifteen(None, None, self)
-            child.move_tile('r')
-            next_states.append(child)
+        for direction in priority:
+            if direction == 'u' and y != 0 and self.undo_move != 'u':
+                child = Fifteen(None, None, self)
+                child.move_tile('u')
+                next_states.append(child)
+            if direction == 'd' and y != len(self.tiles) - 1 and self.undo_move != 'd':
+                child = Fifteen(None, None, self)
+                child.move_tile('d')
+                next_states.append(child)
+            if direction == 'l' and x != 0 and self.undo_move != 'l':
+                child = Fifteen(None, None, self)
+                child.move_tile('l')
+                next_states.append(child)
+            if direction == 'r' and x != len(self.tiles[y]) - 1 and self.undo_move != 'r':
+                child = Fifteen(None, None, self)
+                child.move_tile('r')
+                next_states.append(child)
         return next_states
 
     def heuristic(self):
@@ -167,3 +159,24 @@ class Fifteen:
 
         print(-1)
         return
+
+    def bfs(self):
+
+        order = ['u', 'r', 'd', 'l']
+        dq = deque([self])
+
+        while(len(dq) > 0):
+
+            current_state = dq.popleft()
+
+            if current_state.hamming() == 0:
+                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
+
+            for state in current_state.generate_next_states(order):
+                dq.append(state)
+
+        print(-1)
+        return
+
+
+

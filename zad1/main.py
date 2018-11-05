@@ -1,7 +1,7 @@
 from fifteen import Fifteen
 from time import time
 
-f = Fifteen('manh', "start.txt")
+f = Fifteen("start.txt", 'manh')
 start = time()
 board, path, amount = f.astar()
 stop = time()
