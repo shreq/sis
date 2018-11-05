@@ -178,5 +178,23 @@ class Fifteen:
         print(-1)
         return
 
+    def dfs(self):
+
+        order = ['u', 'r', 'd', 'l']
+        stack = [self]
+
+        while (len(stack) > 0):
+
+            current_state = stack.pop()
+
+            if current_state.hamming() == 0:
+                return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
+            if current_state.depth < 20:
+                for state in current_state.generate_next_states(order):
+                    stack.append(state)
+
+        print(-1)
+        return
+
 
 
