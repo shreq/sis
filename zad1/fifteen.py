@@ -13,10 +13,11 @@ class Fifteen:
     zero_x = 0
     zero_y = 0
 
-    def __init__(self, fin, heur = 'hamm', parent=None):
+    def __init__(self, fin, heur='hamm', parent=None):
         if parent is None:
             self.heur = heur
             with open(fin, 'r', encoding='utf-8') as fi:
+                next(fi)
                 self.tiles = [list(map(int, line.split())) for line in fi]
             self.zero_x, self.zero_y = self.find()
         elif parent is not None:
@@ -84,23 +85,25 @@ class Fifteen:
         else:
             raise NameError
 
-    def generate_next_states(self, priority = ['u', 'd', 'l', 'r']):
+    def generate_next_states(self, priority=None):
+        if priority is None:
+            priority = ['U', 'R', 'D', 'L']
         next_states = []
         x, y = self.zero_x, self.zero_y
         for direction in priority:
-            if direction == 'u' and y != 0 and self.undo_move != 'u':
+            if direction == 'U' and y != 0 and self.undo_move != 'u':
                 child = Fifteen(None, None, self)
                 child.move_tile('u')
                 next_states.append(child)
-            if direction == 'd' and y != len(self.tiles) - 1 and self.undo_move != 'd':
+            elif direction == 'D' and y != len(self.tiles) - 1 and self.undo_move != 'd':
                 child = Fifteen(None, None, self)
                 child.move_tile('d')
                 next_states.append(child)
-            if direction == 'l' and x != 0 and self.undo_move != 'l':
+            elif direction == 'L' and x != 0 and self.undo_move != 'l':
                 child = Fifteen(None, None, self)
                 child.move_tile('l')
                 next_states.append(child)
-            if direction == 'r' and x != len(self.tiles[y]) - 1 and self.undo_move != 'r':
+            elif direction == 'R' and x != len(self.tiles[y]) - 1 and self.undo_move != 'r':
                 child = Fifteen(None, None, self)
                 child.move_tile('r')
                 next_states.append(child)
@@ -149,48 +152,46 @@ class Fifteen:
 
             if current_state.heuristic() == 0:
                 return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
-            if current_state.depth < 200:
-                for state in current_state.generate_next_states():
-                    if repr(state.tiles) in closed_set:
-                        continue
-                    state.h_score = state.heuristic()
-                    state.f_score = state.h_score + state.depth
-                    heapq.heappush(open_set, state)
+
+            for state in current_state.generate_next_states():
+                if repr(state.tiles) in closed_set:
+                    continue
+                state.h_score = state.heuristic()
+                state.f_score = state.h_score + state.depth
+                heapq.heappush(open_set, state)
 
         print(-1)
         return
 
-    def bfs(self):
+    def bfs(self, priority):
 
-        order = ['u', 'r', 'd', 'l']
         dq = deque([self])
 
-        while(len(dq) > 0):
+        while len(dq) > 0:
 
             current_state = dq.popleft()
 
             if current_state.hamming() == 0:
                 return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
 
-            for state in current_state.generate_next_states(order):
+            for state in current_state.generate_next_states(priority):
                 dq.append(state)
 
         print(-1)
         return
 
-    def dfs(self):
+    def dfs(self, priority):
 
-        order = ['u', 'r', 'd', 'l']
         stack = [self]
 
-        while (len(stack) > 0):
+        while len(stack) > 0:
 
             current_state = stack.pop()
 
             if current_state.hamming() == 0:
                 return current_state.tiles, current_state.previous_moves, len(current_state.previous_moves)
             if current_state.depth < 20:
-                for state in current_state.generate_next_states(order):
+                for state in current_state.generate_next_states(priority):
                     stack.append(state)
 
         print(-1)
