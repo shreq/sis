@@ -36,8 +36,9 @@ print(path)
 print(solution_length)
 
 with open(sys.argv[4], 'w', encoding='utf-8') as fout:
-    fout.write(str(solution_length) + '\n')
-    fout.write(path)
+    fout.write(str(solution_length))
+    if solution_length != -1:
+        fout.write('\n' + path)
 
 with open(sys.argv[5], 'w', encoding='utf-8') as fout:
     fout.write(str(solution_length) + '\n')

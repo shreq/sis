@@ -186,7 +186,7 @@ class Fifteen:
                 heapq.heappush(open_set, state)
                 visited += 1
         print(-1)
-        return
+        return -1, visited, processed, max_depth, '', ''
 
     def bfs(self, priority):
         open_set = deque([self])
@@ -207,7 +207,7 @@ class Fifteen:
                 open_set.append(state)
                 visited += 1
         print(-1)
-        return
+        return -1, visited, processed, max_depth, '', ''
 
     def dfs(self, priority):
         open_set = [self]  # stack
@@ -229,4 +229,4 @@ class Fifteen:
                     open_set.append(state)
                     visited += 1
         print(-1)
-        return
+        return -1, visited, processed, max_depth, '', ''
