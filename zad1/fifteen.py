@@ -5,6 +5,7 @@ import heapq
 
 class Fifteen:
     heur = ''
+    priority = ''
     tiles = []
     undo_move = ''  # used to avoid getting stuck in a back and forth loop
     h_score = None  # calculated using heuristic
@@ -16,13 +17,17 @@ class Fifteen:
 
     def __init__(self, fin, heur='hamm', parent=None):
         if parent is None:
-            self.heur = heur
+            if heur == 'hamm' or heur == 'manh':                    # check if this parameter was used to pass heuristic or priority
+                self.heur = heur
+            else:
+                self.priority = heur
             with open(fin, 'r', encoding='utf-8') as fi:
-                next(fi)
+                next(fi)                                            # skip first line that contains size of puzzles as it is unnecessary
                 self.tiles = [list(map(int, line.split())) for line in fi]
             self.zero_x, self.zero_y = self.find()
-        elif parent is not None:
+        elif parent is not None:                                    # if it's only a child just take parameters from parent
             self.heur = deepcopy(parent.heur)
+            self.priority = deepcopy(parent.priority)
             self.tiles = deepcopy(parent.tiles)
             self.undo_move = deepcopy(parent.undo_move)
             self.depth = deepcopy(parent.depth) + 1
@@ -30,7 +35,7 @@ class Fifteen:
             self.zero_x = deepcopy(parent.zero_x)
             self.zero_y = deepcopy(parent.zero_y)
 
-    def __eq__(self, other):
+    def __eq__(self, other):                    # functions needed for heapq
         return self.f_score == other.f_score
 
     def __ne__(self, other):
@@ -102,7 +107,7 @@ class Fifteen:
 
     def generate_next_states(self, priority=None):
         if priority is None:
-            priority = ['U', 'R', 'D', 'L']
+            priority = 'UDLR'
         next_states = []
         x, y = self.zero_x, self.zero_y
         for direction in priority:
@@ -137,23 +142,22 @@ class Fifteen:
                 if y == len(self.tiles) - 1 and x == len(self.tiles[y]) - 1:
                     if self.tiles[y][x] != 0:
                         diff += 1
-                elif self.tiles[y][x] != y * len(self.tiles) + x + 1:
+                elif self.tiles[y][x] != y * len(self.tiles[y]) + x + 1:
                     diff += 1
         return diff
 
     def manhattan(self):
         score = 0
-        value = 1
-
+        tile = 1
         for y in range(len(self.tiles)):
             for x in range(len(self.tiles[y])):
-                if value == 16:
+                if tile == len(self.tiles) * len(self.tiles[y]):
                     continue
-                x_real, y_real = self.find(value)
+                x_real, y_real = self.find(tile)
                 dx = abs(x - x_real)
                 dy = abs(y - y_real)
                 score += dx + dy
-                value += 1
+                tile += 1
         return score
 
     def astar(self):
@@ -172,8 +176,8 @@ class Fifteen:
             closed_set[repr(current_state.tiles)] = current_state
 
             if current_state.heuristic() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
-                       current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+
             for state in current_state.generate_next_states():
                 if repr(state.tiles) in closed_set:
                     continue
@@ -185,44 +189,44 @@ class Fifteen:
         return
 
     def bfs(self, priority):
-        dq = deque([self])
+        open_set = deque([self])
         visited = 1
         processed = 0
         max_depth = 0
 
-        while dq:
-            current_state = dq.popleft()
+        while open_set:
+            current_state = open_set.popleft()
             processed += 1
             if current_state.depth > max_depth:
                 max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
-                       current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+
             for state in current_state.generate_next_states(priority):
-                dq.append(state)
+                open_set.append(state)
                 visited += 1
         print(-1)
         return
 
     def dfs(self, priority):
-        stack = [self]
+        open_set = [self]  # stack
         visited = 1
         processed = 0
         max_depth = 0
 
-        while stack:
-            current_state = stack.pop()
+        while open_set:
+            current_state = open_set.pop()
             processed += 1
             if current_state.depth > max_depth:
                 max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(),\
-                       current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+
             if current_state.depth < 20:
                 for state in current_state.generate_next_states(priority):
-                    stack.append(state)
+                    open_set.append(state)
                     visited += 1
         print(-1)
         return

@@ -2,6 +2,7 @@ from fifteen import Fifteen
 from time import time
 import sys
 
+# args:
 # 1 [bfs | dfs | astr] algorithm
 # 2 [urdl | hamm | manh] priority/heuristic
 # 3 starting state file
@@ -25,6 +26,9 @@ elif sys.argv[1] == 'astr':
     start = time()
     solution_length, visited, processed, max_depth, path, tiles = f.astar()
     stop = time()
+
+else:
+    raise NameError
 
 print(stop - start)
 print(tiles)
