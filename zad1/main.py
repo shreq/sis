@@ -30,11 +30,6 @@ elif sys.argv[1] == 'astr':
 else:
     raise NameError
 
-print(stop - start)
-print(tiles)
-print(path)
-print(solution_length)
-
 with open(sys.argv[4], 'w', encoding='utf-8') as fout:
     fout.write(str(solution_length))
     if solution_length != -1:
