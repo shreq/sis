@@ -176,7 +176,8 @@ class Fifteen:
             closed_set[repr(current_state.tiles)] = current_state
 
             if current_state.heuristic() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                       current_state.tiles2str()
 
             for state in current_state.generate_next_states():
                 if repr(state.tiles) in closed_set:
@@ -201,7 +202,8 @@ class Fifteen:
                 max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                       current_state.tiles2str()
 
             for state in current_state.generate_next_states(priority):
                 open_set.append(state)
@@ -222,7 +224,8 @@ class Fifteen:
                 max_depth = current_state.depth
 
             if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), current_state.tiles2str()
+                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                       current_state.tiles2str()
 
             if current_state.depth < 20:
                 for state in current_state.generate_next_states(priority):

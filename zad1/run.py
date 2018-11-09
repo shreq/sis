@@ -1,4 +1,13 @@
 import subprocess
+import os
 
-for i in '1234':
-    subprocess.call('python main.py astr manh ./../../puzzlegen/4x4_02_0000' + i + '.txt ./output/stop4x4_02_0000' + i + '.txt ./output/stats4x4_02_0000' + i + '.txt', shell=True)
+directory = os.fsencode('./input/')
+
+for algorithm in ['astr', 'dfs', 'bfs']:
+    if algorithm == 'astr':
+        for heuristic in ['hamm', 'manh']:
+            for file in os.listdir(directory):
+                filename = os.fsdecode(file)
+                subprocess.call(['python main.py', algorithm, heuristic , filename, 'solv_' + filename, 'stats_' + filename])
+
+
