@@ -17,15 +17,15 @@ class Fifteen:
 
     def __init__(self, fin, heur='hamm', parent=None):
         if parent is None:
-            if heur == 'hamm' or heur == 'manh':                    # check if this parameter was used to pass heuristic or priority
+            if heur == 'hamm' or heur == 'manh':  # check if this parameter was used to pass heuristic or priority
                 self.heur = heur
             else:
                 self.priority = heur
             with open(fin, 'r', encoding='utf-8') as fi:
-                next(fi)                                            # skip first line that contains size of puzzles as it is unnecessary
+                next(fi)                            # skip first line that contains size of puzzles as it is unnecessary
                 self.tiles = [list(map(int, line.split())) for line in fi]
             self.zero_x, self.zero_y = self.find()
-        elif parent is not None:                                    # if it's only a child just take parameters from parent
+        elif parent is not None:                    # if it's only a child just take parameters from parent
             self.heur = deepcopy(parent.heur)
             self.priority = deepcopy(parent.priority)
             self.tiles = deepcopy(parent.tiles)
