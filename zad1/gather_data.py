@@ -67,9 +67,9 @@ def gather_data():
                     astr_data[statistic][complexity][heuristic] /= divisor
                     astr_data[statistic][complexity][heuristic] = round(astr_data[statistic][complexity][heuristic], 3)
 
-    with open('bfs_dfs_data.json', 'w') as fp:
-        json.dump(data, fp)
-    with open('astr_data.json', 'w') as fp:
-        json.dump(astr_data, fp)
+    # with open('bfs_dfs_data.json', 'w') as fp:
+    #     json.dump(data, fp)
+    # with open('astr_data.json', 'w') as fp:
+    #     json.dump(astr_data, fp)
 
     return data, astr_data
