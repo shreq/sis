@@ -1,7 +1,10 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from gather_data import gather_data
 
+if not os.path.exists('charts'):
+    os.makedirs('charts')
 
 bfs_dfs_data, astr_data = gather_data()
 width = 0.3
@@ -24,7 +27,8 @@ for statistic in astr_data.keys():
     plt.yscale('linear')
     plt.ylabel(statistic)
     plt.title("A*: " + statistic)
-    plt.show()
+    plt.savefig("charts/astr_" + statistic)
+    #plt.show()
 
 
 width = 0.1
@@ -71,6 +75,7 @@ for algorithm in bfs_dfs_data.keys():
         ax1.set_yscale('linear')
         ax1.legend(title="Priorities:")
         plt.title(algorithm + " " + statistic)
-        plt.show()
+        plt.savefig("charts/" + algorithm + '_' + statistic)
+        #plt.show()
 
 
