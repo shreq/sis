@@ -72,7 +72,10 @@ for algorithm in bfs_dfs_data.keys():
         ax1.set_xticks(bar_x_tick)
 
         ax1.set_xticklabels(bar_x_label, rotation='vertical')
-        ax1.set_yscale('linear')
+        if statistic == 'processed_states' or statistic == 'visited_states':
+            ax1.set_yscale('log')
+        else:
+            ax1.set_yscale('linear')
         ax1.legend(title="Priorities:")
         plt.title(algorithm + " " + statistic)
         plt.savefig("charts/" + algorithm + '_' + statistic)
