@@ -28,8 +28,8 @@ for statistic in astr_data.keys():
     plt.ylabel(statistic)
     plt.title("A*: " + statistic)
     plt.savefig("charts/astr_" + statistic)
-    #plt.show()
-
+    # plt.show()
+    plt.clf()
 
 width = 0.1
 priorities = bfs_dfs_data['bfs']['time']['01'].keys()
@@ -76,6 +76,8 @@ for algorithm in bfs_dfs_data.keys():
         ax1.legend(title="Priorities:")
         plt.title(algorithm + " " + statistic)
         plt.savefig("charts/" + algorithm + '_' + statistic)
-        #plt.show()
+        plt.clf()
+        # plt.show()
+        plt.clf()
 
 
