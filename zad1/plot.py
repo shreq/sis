@@ -31,6 +31,8 @@ for statistic in astr_data.keys():
     # plt.show()
     plt.clf()
 
+
+# bfs and dfs plots
 width = 0.1
 priorities = bfs_dfs_data['bfs']['time']['01'].keys()
 
@@ -79,8 +81,50 @@ for algorithm in bfs_dfs_data.keys():
         ax1.legend(title="Priorities:")
         plt.title(algorithm + " " + statistic)
         plt.savefig("charts/" + algorithm + '_' + statistic)
-        plt.clf()
         # plt.show()
         plt.clf()
+
+# combined plots
+
+width = 0.25
+bfs_data = bfs_dfs_data['bfs']
+dfs_data = bfs_dfs_data['dfs']
+
+for statistic in astr_data.keys():
+    astr_avg = [0] * 7
+    bfs_avg = [0] * 7
+    dfs_avg = [0] * 7
+    for name, algorithm in zip(['astr', 'bfs', 'dfs'], [astr_data, bfs_data, dfs_data]):
+        for index, complexity in enumerate(algorithm[statistic].keys()):
+            for priority in algorithm[statistic][complexity].keys():
+                if name == 'astr':
+                    astr_avg[index] += algorithm[statistic][complexity][priority] / 2
+                elif name == 'bfs':
+                    bfs_avg[index] += algorithm[statistic][complexity][priority] / 8
+                else:
+                    dfs_avg[index] += algorithm[statistic][complexity][priority] / 8
+
+    pos = np.arange(1, 8)
+    plt.bar(pos - (width * 1.5), astr_avg, width, label="A*", align="edge")
+    plt.bar(pos, bfs_avg, width, label="bfs")
+    plt.bar(pos + width * 0.5, dfs_avg, width, label="dfs", align="edge")
+    plt.minorticks_on()
+    plt.grid(True, which="major", axis="y", ls="--", color="black")
+    plt.legend(title="Algorithm: ")
+    plt.xlabel("Puzzle complexity")
+    plt.ylabel(statistic)
+    plt.title("Algorithm comparision: " + statistic)
+    if statistic == 'processed_states' or statistic == 'visited_states':
+        plt.yscale('log')
+    else:
+        plt.yscale('linear')
+    plt.savefig("charts/all_" + statistic)
+    # plt.show()
+    plt.clf()
+
+
+
+
+
 
 
