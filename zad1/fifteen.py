@@ -168,25 +168,27 @@ class Fifteen:
         processed = 0
         max_depth = 0
 
-        while open_set:
-            current_state = heapq.heappop(open_set)
-            processed += 1
-            if current_state.depth > max_depth:
-                max_depth = current_state.depth
-            closed_set[repr(current_state.tiles)] = current_state
+        try:
+            while open_set:
+                current_state = heapq.heappop(open_set)
+                processed += 1
+                if current_state.depth > max_depth:
+                    max_depth = current_state.depth
+                closed_set[repr(current_state.tiles)] = current_state
 
-            if current_state.heuristic() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
-                       current_state.tiles2str()
+                if current_state.heuristic() == 0:
+                    return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                           current_state.tiles2str()
 
-            for state in current_state.generate_next_states():
-                if repr(state.tiles) in closed_set:
-                    continue
-                state.h_score = state.heuristic()
-                state.f_score = state.h_score + state.depth
-                heapq.heappush(open_set, state)
-                visited += 1
-        print(-1)
+                for state in current_state.generate_next_states():
+                    if repr(state.tiles) in closed_set:
+                        continue
+                    state.h_score = state.heuristic()
+                    state.f_score = state.h_score + state.depth
+                    heapq.heappush(open_set, state)
+                    visited += 1
+        except MemoryError:
+            print(-1)
         return -1, visited, processed, max_depth, '', ''
 
     def bfs(self, priority):
@@ -195,20 +197,22 @@ class Fifteen:
         processed = 0
         max_depth = 0
 
-        while open_set:
-            current_state = open_set.popleft()
-            processed += 1
-            if current_state.depth > max_depth:
-                max_depth = current_state.depth
+        try:
+            while open_set:
+                current_state = open_set.popleft()
+                processed += 1
+                if current_state.depth > max_depth:
+                    max_depth = current_state.depth
 
-            if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
-                       current_state.tiles2str()
+                if current_state.hamming() == 0:
+                    return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                           current_state.tiles2str()
 
-            for state in current_state.generate_next_states(priority):
-                open_set.append(state)
-                visited += 1
-        print(-1)
+                for state in current_state.generate_next_states(priority):
+                    open_set.append(state)
+                    visited += 1
+        except MemoryError:
+            print(-1)
         return -1, visited, processed, max_depth, '', ''
 
     def dfs(self, priority):
@@ -217,19 +221,21 @@ class Fifteen:
         processed = 0
         max_depth = 0
 
-        while open_set:
-            current_state = open_set.pop()
-            processed += 1
-            if current_state.depth > max_depth:
-                max_depth = current_state.depth
+        try:
+            while open_set:
+                current_state = open_set.pop()
+                processed += 1
+                if current_state.depth > max_depth:
+                    max_depth = current_state.depth
 
-            if current_state.hamming() == 0:
-                return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
-                       current_state.tiles2str()
+                if current_state.hamming() == 0:
+                    return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
+                           current_state.tiles2str()
 
-            if current_state.depth < 20:
-                for state in current_state.generate_next_states(priority):
-                    open_set.append(state)
-                    visited += 1
-        print(-1)
+                if current_state.depth < 20:
+                    for state in reversed(current_state.generate_next_states(priority)):
+                        open_set.append(state)
+                        visited += 1
+        except MemoryError:
+            print(-1)
         return -1, visited, processed, max_depth, '', ''

@@ -11,21 +11,21 @@ import sys
 
 if sys.argv[1] == 'bfs':
     f = Fifteen(sys.argv[3])
-    start = time()
+    start = time() * 1000
     solution_length, visited, processed, max_depth, path, tiles = f.bfs(sys.argv[2])
-    stop = time()
+    stop = time() * 1000
 
 elif sys.argv[1] == 'dfs':
     f = Fifteen(sys.argv[3])
-    start = time()
+    start = time() * 1000
     solution_length, visited, processed, max_depth, path, tiles = f.dfs(sys.argv[2])
-    stop = time()
+    stop = time() * 1000
 
 elif sys.argv[1] == 'astr':
     f = Fifteen(sys.argv[3], sys.argv[2])
-    start = time()
+    start = time() * 1000
     solution_length, visited, processed, max_depth, path, tiles = f.astar()
-    stop = time()
+    stop = time() * 1000
 
 else:
     raise NameError
