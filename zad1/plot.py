@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from gather_data import gather_data
+from unicodedata import normalize
 
 if not os.path.exists('charts'):
     os.makedirs('charts')
@@ -19,22 +20,22 @@ for statistic in astr_data.keys():
     ind = np.arange(1, 8)
     plt.bar(ind - width/2, manh_data, width, label='manhattan')
     plt.bar(ind + width/2, hamm_data, width, label='hamming')
-    plt.xlabel("Puzzle complexity")
+    plt.xlabel("skomplikowanie puzzli")
     plt.minorticks_on()
     plt.grid(True, which="major", axis="y", ls="--", color="black")
     plt.grid(True, which="minor", axis="y", ls="--")
-    plt.legend(title="Heuristics:")
+    plt.legend(title="Heurystyka:")
     plt.yscale('linear')
     plt.ylabel(statistic)
     plt.title("A*: " + statistic)
-    plt.savefig("charts/astr_" + statistic)
+    plt.savefig("charts/astr_" + normalize('NFKD', statistic.replace('ł', 'l')).encode('ascii', 'ignore').decode('ascii'))
     # plt.show()
     plt.clf()
 
 
 # bfs and dfs plots
 width = 0.1
-priorities = bfs_dfs_data['bfs']['time']['01'].keys()
+priorities = bfs_dfs_data['bfs']['czas [ms]']['01'].keys()
 
 for algorithm in bfs_dfs_data.keys():
     for statistic in bfs_dfs_data[algorithm].keys():
@@ -62,11 +63,11 @@ for algorithm in bfs_dfs_data.keys():
                     width,
                     align="edge",
                     label=priority)
-        ax1.set_xlabel("Search priorities")
+        ax1.set_xlabel("priorytety")
         ax1.grid(True)
 
         ax2 = ax1.twiny()
-        ax2.set_xlabel("Puzzle complexity")
+        ax2.set_xlabel("skomplikowanie puzzli")
         ax1.set_ylabel(statistic)
 
         ax2.set_xticks(range(0, 8))
@@ -74,18 +75,18 @@ for algorithm in bfs_dfs_data.keys():
         ax1.set_xticks(bar_x_tick)
 
         ax1.set_xticklabels(bar_x_label, rotation='vertical')
-        if statistic == 'processed_states' or statistic == 'visited_states' or (statistic == 'time' and algorithm == 'dfs'):
+        if statistic == 'stany przetworzone' or statistic == 'stany odwiedzone' or (statistic == 'czas [ms]'):
             ax1.set_yscale('log')
         else:
             ax1.set_yscale('linear')
-        ax1.legend(title="Priorities:")
+        ax1.legend(title="Priorytety:")
         plt.title(algorithm + " " + statistic)
-        plt.savefig("charts/" + algorithm + '_' + statistic)
+        plt.savefig("charts/" + algorithm + '_' + normalize('NFKD', statistic.replace('ł', 'l')).encode('ascii', 'ignore').decode('ascii'))
         # plt.show()
         plt.clf()
 
-# combined plots
 
+# combined plots
 width = 0.25
 bfs_data = bfs_dfs_data['bfs']
 dfs_data = bfs_dfs_data['dfs']
@@ -106,25 +107,18 @@ for statistic in astr_data.keys():
 
     pos = np.arange(1, 8)
     plt.bar(pos - (width * 1.5), astr_avg, width, label="A*", align="edge")
-    plt.bar(pos, bfs_avg, width, label="bfs")
-    plt.bar(pos + width * 0.5, dfs_avg, width, label="dfs", align="edge")
+    plt.bar(pos, bfs_avg, width, label="BFS")
+    plt.bar(pos + width * 0.5, dfs_avg, width, label="DFS", align="edge")
     plt.minorticks_on()
     plt.grid(True, which="major", axis="y", ls="--", color="black")
-    plt.legend(title="Algorithm: ")
-    plt.xlabel("Puzzle complexity")
+    plt.legend(title="Algorytm: ")
+    plt.xlabel("skomplikowanie puzzli")
     plt.ylabel(statistic)
-    plt.title("Algorithm comparision: " + statistic)
-    if statistic == 'processed_states' or statistic == 'visited_states' or statistic == 'time':
+    plt.title("Porównanie algorytmów: " + statistic)
+    if statistic == 'stany przetworzone' or statistic == 'stany odwiedzone' or statistic == 'czas [ms]':
         plt.yscale('log')
     else:
         plt.yscale('linear')
-    plt.savefig("charts/all_" + statistic)
+    plt.savefig("charts/all_" + normalize('NFKD', statistic.replace('ł', 'l')).encode('ascii', 'ignore').decode('ascii'))
     # plt.show()
     plt.clf()
-
-
-
-
-
-
-

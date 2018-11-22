@@ -10,7 +10,7 @@ def gather_data():
 
     for algorithm in ['bfs', 'dfs']:
         data[algorithm] = {}
-        for statistic in ['solution_length', 'visited_states', 'processed_states', 'maximum_depth', 'time']:
+        for statistic in ['długość rozwiązania', 'stany odwiedzone', 'stany przetworzone', 'maksymalna głębokość', 'czas [ms]']:
             data[algorithm][statistic] = {}
             for complexity in ['01', '02', '03', '04', '05', '06', '07']:
                 data[algorithm][statistic][complexity] = {}
@@ -24,11 +24,11 @@ def gather_data():
             if filename_split[0] != 'astr':
                 with open('output/' + filename) as fi:
                     lines = fi.readlines()
-                    data[filename_split[0]]['solution_length'][filename_split[4]][filename_split[1]] += int(lines[0])
-                    data[filename_split[0]]['visited_states'][filename_split[4]][filename_split[1]] += int(lines[1])
-                    data[filename_split[0]]['processed_states'][filename_split[4]][filename_split[1]] += int(lines[2])
-                    data[filename_split[0]]['maximum_depth'][filename_split[4]][filename_split[1]] += int(lines[3])
-                    data[filename_split[0]]['time'][filename_split[4]][filename_split[1]] += float(lines[4])
+                    data[filename_split[0]]['długość rozwiązania'][filename_split[4]][filename_split[1]] += int(lines[0])
+                    data[filename_split[0]]['stany odwiedzone'][filename_split[4]][filename_split[1]] += int(lines[1])
+                    data[filename_split[0]]['stany przetworzone'][filename_split[4]][filename_split[1]] += int(lines[2])
+                    data[filename_split[0]]['maksymalna głębokość'][filename_split[4]][filename_split[1]] += int(lines[3])
+                    data[filename_split[0]]['czas [ms]'][filename_split[4]][filename_split[1]] += float(lines[4])
 
     for algorithm in data.keys():
         for statistic in data[algorithm].keys():
@@ -41,7 +41,7 @@ def gather_data():
     # astar
     astr_data = {}
 
-    for statistic in ['solution_length', 'visited_states', 'processed_states', 'maximum_depth', 'time']:
+    for statistic in ['długość rozwiązania', 'stany odwiedzone', 'stany przetworzone', 'maksymalna głębokość', 'czas [ms]']:
         astr_data[statistic] = {}
         for complexity in ['01', '02', '03', '04', '05', '06', '07']:
             astr_data[statistic][complexity] = {}
@@ -55,11 +55,11 @@ def gather_data():
             if filename_split[0] == 'astr':
                 with open('output/' + filename) as fi:
                     lines = fi.readlines()
-                    astr_data['solution_length'][filename_split[4]][filename_split[1]] += int(lines[0])
-                    astr_data['visited_states'][filename_split[4]][filename_split[1]] += int(lines[1])
-                    astr_data['processed_states'][filename_split[4]][filename_split[1]] += int(lines[2])
-                    astr_data['maximum_depth'][filename_split[4]][filename_split[1]] += int(lines[3])
-                    astr_data['time'][filename_split[4]][filename_split[1]] += float(lines[4])
+                    astr_data['długość rozwiązania'][filename_split[4]][filename_split[1]] += int(lines[0])
+                    astr_data['stany odwiedzone'][filename_split[4]][filename_split[1]] += int(lines[1])
+                    astr_data['stany przetworzone'][filename_split[4]][filename_split[1]] += int(lines[2])
+                    astr_data['maksymalna głębokość'][filename_split[4]][filename_split[1]] += int(lines[3])
+                    astr_data['czas [ms]'][filename_split[4]][filename_split[1]] += float(lines[4])
 
     for statistic in astr_data.keys():
         for complexity, divisor in zip(astr_data[statistic].keys(), [2, 4, 10, 24, 54, 107, 212]):
