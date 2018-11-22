@@ -9,7 +9,7 @@ class Fifteen:
     tiles = []
     undo_move = ''  # used to avoid getting stuck in a back and forth loop
     h_score = None  # calculated using heuristic
-    depth = 0       # amount of moves
+    depth = 0  # amount of moves
     f_score = None  # h_score + depth
     previous_moves = []
     zero_x = 0
@@ -22,10 +22,10 @@ class Fifteen:
             else:
                 self.priority = heur
             with open(fin, 'r', encoding='utf-8') as fi:
-                next(fi)                            # skip first line that contains size of puzzles as it is unnecessary
+                next(fi)  # skip first line that contains size of puzzles as it is unnecessary
                 self.tiles = [list(map(int, line.split())) for line in fi]
             self.zero_x, self.zero_y = self.find()
-        elif parent is not None:                    # if it's only a child just take parameters from parent
+        elif parent is not None:  # if it's only a child just take parameters from parent
             self.heur = deepcopy(parent.heur)
             self.priority = deepcopy(parent.priority)
             self.tiles = deepcopy(parent.tiles)
@@ -35,7 +35,7 @@ class Fifteen:
             self.zero_x = deepcopy(parent.zero_x)
             self.zero_y = deepcopy(parent.zero_y)
 
-    def __eq__(self, other):                    # functions needed for heapq
+    def __eq__(self, other):  # functions needed for heapq
         return self.f_score == other.f_score
 
     def __ne__(self, other):
@@ -154,9 +154,9 @@ class Fifteen:
                 if tile == len(self.tiles) * len(self.tiles[y]):
                     continue
                 x_real, y_real = self.find(tile)
-                dx = abs(x - x_real)
-                dy = abs(y - y_real)
-                score += dx + dy
+                # dx = abs(x - x_real)
+                # dy = abs(y - y_real)
+                score += abs(x - x_real) + abs(y - y_real)
                 tile += 1
         return score
 
@@ -204,7 +204,8 @@ class Fifteen:
                 if current_state.depth > max_depth:
                     max_depth = current_state.depth
 
-                if current_state.hamming() == 0:
+                # if current_state.hamming() == 0:
+                if current_state.tiles == [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]:
                     return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
                            current_state.tiles2str()
 
@@ -228,7 +229,8 @@ class Fifteen:
                 if current_state.depth > max_depth:
                     max_depth = current_state.depth
 
-                if current_state.hamming() == 0:
+                # if current_state.hamming() == 0:
+                if current_state.tiles == [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]:
                     return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
                            current_state.tiles2str()
 
