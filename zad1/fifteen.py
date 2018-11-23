@@ -204,8 +204,7 @@ class Fifteen:
                 if current_state.depth > max_depth:
                     max_depth = current_state.depth
 
-                # if current_state.hamming() == 0:
-                if current_state.tiles == [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]:
+                if current_state.heuristic() == 0:
                     return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
                            current_state.tiles2str()
 
@@ -229,8 +228,7 @@ class Fifteen:
                 if current_state.depth > max_depth:
                     max_depth = current_state.depth
 
-                # if current_state.hamming() == 0:
-                if current_state.tiles == [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]]:
+                if current_state.heuristic() == 0:
                     return len(current_state.previous_moves), visited, processed, max_depth, current_state.path2str(), \
                            current_state.tiles2str()
 
