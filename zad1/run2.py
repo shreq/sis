@@ -5,7 +5,7 @@ directory = os.fsencode('./input/')
 if not os.path.exists('output'):
     os.makedirs('output')
 
-algorithms = ['dfs']   # ['astr', 'bfs', 'dfs']
+algorithms = ['astr']   # ['astr', 'bfs', 'dfs']
 priorities = ['RDUL', 'RDLU', 'DRUL', 'DRLU', 'LUDR', 'LURD', 'ULDR', 'ULRD']  # ['RDUL', 'RDLU', 'DRUL', 'DRLU', 'LUDR', 'LURD', 'ULDR', 'ULRD']
 
 for algorithm in algorithms:
@@ -15,10 +15,10 @@ for algorithm in algorithms:
             print('\t' + heuristic)
             for file in os.listdir(directory):
                 filename = os.fsdecode(file)
-                if not os.path.exists('output/' + algorithm + '_' + heuristic + '_solv_' + filename):
-                    subprocess.call(['python', 'main.py', algorithm, heuristic, 'input/' + filename,
-                                     'output/' + algorithm + '_' + heuristic + '_solv_' + filename,
-                                     'output/' + algorithm + '_' + heuristic + '_stats_' + filename])
+                #if not os.path.exists('output/' + algorithm + '_' + heuristic + '_solv_' + filename):
+                subprocess.call(['python', 'main.py', algorithm, heuristic, 'input/' + filename,
+                                 'output/' + algorithm + '_' + heuristic + '_solv_' + filename,
+                                 'output/' + algorithm + '_' + heuristic + '_stats_' + filename])
     else:
         for priority in priorities:
             print('\t' + priority)

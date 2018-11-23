@@ -15,20 +15,23 @@
 #  size_depth_id_strategy_param_sol.txt
 # for example:
 #  4x4_01_00001_bfs_rdul_sol.txt
+#  bfs_RDUL_solv_4x4_01_00001.txt
 #
 # TODO: Change variable $progcmd to match the command needed to invoke the
 # actual program, using the absolute (or relative) path, for example:
 #  progcmd='java -jar /home/user/15puzzle/bin/puzzleval.jar'
 
-progcmd='echo program'
-sol_filename_regex='^([a-zA-Z0-9]+_[0-9]+_[0-9]+)_[a-zA-Z]+_[a-zA-Z]+_sol.txt$'
+progcmd='java -jar ./puzzleval.jar'
+#sol_filename_regex='^([a-zA-Z0-9]+_[0-9]+_[0-9]+)_[a-zA-Z]+_[a-zA-Z]+_sol.txt$'
+sol_filename_regex='^[a-zA-Z]_+[a-zA-Z]_+solv_(+[a-zA-Z0-9]+_[0-9]+_[0-9])+.txt$'
 
 n_correct_sols=0
 n_incorrect_sols=0
 incorrect_sol_filenames=()
 for filename in *; do
-    if [[ -f "$filename" && "$filename" =~ $sol_filename_regex ]]; then
-        init_filename="${BASH_REMATCH[1]}.txt"
+    echo "$filename"
+    if [[ -f "$filename" && "$filename" =~ $sol_filename_regex ]]; then  # 
+        init_filename="${BASH_REMATCH[2]}.txt"
         echo -n "$filename: "
         $progcmd "$init_filename" "$filename"
         if [[ $? == 0 ]]; then
