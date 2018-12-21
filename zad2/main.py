@@ -3,34 +3,44 @@
 # ma nauczyć się obliczania pierwiastka drugiego stopnia liczby
 # nauczyć przy użyciu wejściowego wektora liczb losowych z zakresu 1-100
 
-import numpy
 from Network import Network
+import numpy
+
+
+def mean_square_error(func, xinput, xoutput):
+    ans = 0
+    for x in range(len(xoutput)):
+        ans += ((func(xinput[x]).T - xoutput[x]) ** 2)
+    return numpy.sum(ans) / len(xoutput)
+
 
 input_list = []
 target_list = []
 
-for i in range(10):
+for i in range(100):
     r = numpy.random.randint(1, 100)
     input_list.append(r)
     target_list.append(numpy.sqrt(r))
 
-for i in range(10):
-    error = []
+i_nodes = 1
+h_nodes = 10
+o_nodes = 1
+lr = 0.3
+bias = 1
+momentum = 0.1
+network = Network(i_nodes, h_nodes, o_nodes, lr, bias, momentum)
+error_ar = [0]
+error = 1
 
-    for j in range(1, 4):
-        i_nodes = 1
-        h_nodes = 4
-        o_nodes = 1
-        lr = 0.1
-        bias = 1
-        network = Network(i_nodes, h_nodes, o_nodes, lr, bias)
-        w = 0
-        error = []
-
-        print('witam ' + str(i) + ' ' + str(j))
-
-        for k in range(len(input_list)):
-            print('halko ' + str(w) + ' ' + str(k))
-            network.train(input_list[k], target_list[k])
-            f = network.query
-
+i = 0
+while error/len(error_ar) > 0.1 and i < 200:
+    error_ar = []
+    error = 0
+    for j in range(len(input_list)):
+        network.train(input_list[j], target_list[j])
+        f = network.query
+        error_test = mean_square_error(f, input_list, target_list)
+        error += error_test
+        error_ar.append(error)
+    i += 1
+    print(str(i) + '\terror ' + str(error/len(error_ar)))
