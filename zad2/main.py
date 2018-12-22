@@ -16,25 +16,26 @@ def mean_square_error(func, xinput, xoutput):
 
 input_list = []
 target_list = []
+network = Network(1, 5, 1, 0.1, 1, 0.2)
 
-for i in range(100):
-    r = numpy.random.randint(1, 100)
-    input_list.append(r)
-    target_list.append(numpy.sqrt(r))
+# for i in range(100):
+#     r = numpy.random.randint(1, 100)
+#     input_list.append(r)
+#     target_list.append(numpy.sqrt(r))
 
-network = Network(1, 5, 1, 0.3, 1, 0.2)
-error_ar = []
-error = 0
+# input_list.append(81)
+# target_list.append(9)
+input_list.append(4)
+target_list.append(2)
 
 i = 0
-while i < 200:
+e = 10
+while i < 10 ** 10 and e > 0.00001:
     error_ar = []
-    error = 0
     for j in range(len(input_list)):
         network.train(input_list[j], target_list[j])
-        f = network.query
-        error_test = mean_square_error(f, input_list, target_list)
-        error += error_test
-        error_ar.append(error_test)
+        error_ar.append(mean_square_error(network.query, input_list, target_list))
+    e = numpy.sum(error_ar) / len(error_ar)
+    # if i % 5000 == 0:
+    print(str(i) + '\terror = ' + str(e))
     i += 1
-    print(str(i) + '\terror ' + str(error/len(error_ar)))
