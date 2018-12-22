@@ -17,7 +17,7 @@ class Network:
         self.w_ho = numpy.random.rand(self.o_nodes, self.h_nodes)
         self.b_ho = numpy.random.rand(self.o_nodes, 1) * bias_switch
         self.momentum = momentum
-        self.beta = 0.1
+        # self.beta = 0.1
         self.activation_func = lambda x: scipy.special.expit(x)
         self.activation_func_output = activation_function_output
         self.derivative_activation_func_output = derivative_activation_function_output
@@ -25,7 +25,6 @@ class Network:
         self.w_ih_back = 0
         self.b_ih_back = 0
         self.b_ho_back = 0
-        pass
 
     def train(self, input_list, target_list):
         inputs = numpy.array(input_list, ndmin=2).T

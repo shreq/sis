@@ -22,18 +22,12 @@ for i in range(100):
     input_list.append(r)
     target_list.append(numpy.sqrt(r))
 
-i_nodes = 1
-h_nodes = 10
-o_nodes = 1
-lr = 0.3
-bias = 1
-momentum = 0.1
-network = Network(i_nodes, h_nodes, o_nodes, lr, bias, momentum)
-error_ar = [0]
-error = 1
+network = Network(1, 5, 1, 0.3, 1, 0.2)
+error_ar = []
+error = 0
 
 i = 0
-while error/len(error_ar) > 0.1 and i < 200:
+while i < 200:
     error_ar = []
     error = 0
     for j in range(len(input_list)):
@@ -41,6 +35,6 @@ while error/len(error_ar) > 0.1 and i < 200:
         f = network.query
         error_test = mean_square_error(f, input_list, target_list)
         error += error_test
-        error_ar.append(error)
+        error_ar.append(error_test)
     i += 1
     print(str(i) + '\terror ' + str(error/len(error_ar)))
