@@ -20,10 +20,10 @@ class Network:
         self.activation_func = lambda x: scipy.special.expit(x)
         self.activation_func_output = activation_function_output
         self.derivative_activation_func_output = derivative_activation_function_output
-        self.w_ho_back = 0
-        self.w_ih_back = 0
-        self.b_ih_back = 0
-        self.b_ho_back = 0
+        self.w_ho_old = 0
+        self.w_ih_old = 0
+        self.b_ih_old = 0
+        self.b_ho_old = 0
 
     def train(self, input_list, target_list):
         inputs = numpy.array(input_list, ndmin=2).T
@@ -41,25 +41,21 @@ class Network:
         h_errors = numpy.dot(self.w_ho.T, o_errors)
 
         # output weights tweaking
-        self.w_ho += self.lr * numpy.dot((o_errors * self.derivative_activation_func_output(o_outputs)), numpy.transpose(h_outputs))
-        self.w_ho += self.w_ho_back * self.momentum
-        self.w_ho_back = self.lr * numpy.dot((o_errors * self.derivative_activation_func_output(o_outputs)), numpy.transpose(h_outputs))
+        self.w_ho += self.lr * numpy.dot((o_errors * self.derivative_activation_func_output(o_outputs)), numpy.transpose(h_outputs)) + self.w_ho_old * self.momentum
+        self.w_ho_old = self.lr * numpy.dot((o_errors * self.derivative_activation_func_output(o_outputs)), numpy.transpose(h_outputs))
 
         # output bias tweaking
-        self.b_ho += self.lr * o_errors * self.derivative_activation_func_output(o_outputs) * self.bias_switch
-        self.b_ho += self.b_ho_back * self.momentum
-        self.b_ho_back = self.lr * o_errors * self.derivative_activation_func_output(o_outputs) * self.bias_switch
+        self.b_ho += self.lr * o_errors * self.derivative_activation_func_output(o_outputs) * self.bias_switch + self.b_ho_old * self.momentum
+        self.b_ho_old = self.lr * o_errors * self.derivative_activation_func_output(o_outputs) * self.bias_switch
         self.b_ho *= self.bias_switch
 
         # hidden weights tweaking
-        self.w_ih += self.lr * numpy.dot((h_errors * h_outputs * (1.0 - h_outputs)), numpy.transpose(inputs))
-        self.w_ih += self.w_ih_back * self.momentum
-        self.w_ih_back = self.lr * numpy.dot((h_errors * h_outputs * (1.0 - h_outputs)), numpy.transpose(inputs))
+        self.w_ih += self.lr * numpy.dot((h_errors * h_outputs * (1.0 - h_outputs)), numpy.transpose(inputs)) + self.w_ih_old * self.momentum
+        self.w_ih_old = self.lr * numpy.dot((h_errors * h_outputs * (1.0 - h_outputs)), numpy.transpose(inputs))
 
         # hidden bias tweaking
-        self.b_ih += self.lr * h_errors * h_outputs * (1.0 - h_outputs)
-        self.b_ih += self.b_ih_back * self.momentum
-        self.b_ih_back = self.lr * h_errors * h_outputs * (1.0 - h_outputs)
+        self.b_ih += self.lr * h_errors * h_outputs * (1.0 - h_outputs) + self.b_ih_old * self.momentum
+        self.b_ih_old = self.lr * h_errors * h_outputs * (1.0 - h_outputs)
         self.b_ih *= self.bias_switch
 
     def query(self, input_list):
