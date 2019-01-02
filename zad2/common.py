@@ -76,7 +76,13 @@ def load_args(args):
     else:
         set_size = 100
 
+    if len(args) > 9:
+        path = args[9]
+    else:
+        path = "network"
+
     return float(acceptable_error), \
            float(learning_rate), float(momentum), \
            int(hidden_size), float(bias_switch), \
-           int(lower_limit), int(upper_limit), int(set_size)
+           int(lower_limit), int(upper_limit), int(set_size), \
+           str(path)
