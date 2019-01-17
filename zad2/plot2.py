@@ -34,5 +34,5 @@ for file in os.listdir(directory):
         test, = plt.plot(input_list, target_list, 'blue', label='wartości oczekiwane')
         approx, = plt.plot(input_list, output, 'red', label='wartości otrzymane')
         plt.legend(handles=[test, approx])
-        plt.savefig('./output/charts/plot_'+filename[:-4]+'.png')
+        plt.savefig('./output/charts/plot_'+filename[:-4].replace('.', '-')+'.png')
         plt.clf()
