@@ -1,11 +1,8 @@
 from common import load, load_args
 import numpy
 import os
-from sys import argv
+import matplotlib.pyplot as plt
 
-#acceptable_error, learning_rate, momentum, hidden_size, bias_switch, lower_limit, upper_limit, set_size, path = load_args(argv)
-
-# start
 input_list = []
 target_list = []
 for i in range(101):
@@ -13,21 +10,29 @@ for i in range(101):
     target_list.append(numpy.sqrt(i))
 
 directory = os.fsencode('./output/saves/')
-if not os.path.exists('./output/numbers'):
-    os.makedirs('./output/numbers')
+if not os.path.exists('./output/charts'):
+    os.makedirs('./output/charts')
 
 output = []
-filenames = []
+temp = []
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
-    filenames.append(filename)
     filename_split = filename.split('_')
     if filename_split[0] == '0.01' and filename_split[5] == '50.ser':
         network = load('./output/saves/' + filename)
-        #for j in range(len(input_list)):
-        output.append(network.query)
-
-for file, o in zip(filenames, range(len(input_list))):
-    with open('./output/numbers/' + file + '.txt', 'w') as f:
-        for i in range(len(input_list)):
-            f.write(str(target_list[i]) + '\t' + str(output[o][i]) + '\n')
+        output.clear()
+        for number in input_list:
+            temp.clear()
+            temp.append(number)
+            output.append(network.query(temp)[0][0])
+        plt.figure(0)
+        plt.suptitle('Aproksymacja funkcji')
+        plt.title('lr=' + filename_split[1] + ', momentum=' + filename_split[2] + ', hidden size=' + filename_split[3] + ', bias=' + filename_split[4])
+        plt.xlabel('x')
+        plt.ylabel('√x')
+        plt.grid()
+        test, = plt.plot(input_list, target_list, 'blue', label='wartości oczekiwane')
+        approx, = plt.plot(input_list, output, 'red', label='wartości otrzymane')
+        plt.legend(handles=[test, approx])
+        plt.savefig('./output/charts/plot_'+filename+'.png')
+        plt.clf()
