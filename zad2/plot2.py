@@ -27,7 +27,7 @@ for file in os.listdir(directory):
             output.append(network.query(temp)[0][0])
         plt.figure(0)
         plt.suptitle('Aproksymacja funkcji')
-        plt.title('lr=' + filename_split[1] + ', momentum=' + filename_split[2] + ', hidden size=' + filename_split[3] + ', bias=' + filename_split[4])
+        plt.title('lr=' + filename_split[1] + ', momentum=' + filename_split[2] + ', neurony ukryte=' + filename_split[3] + ', bias=' + filename_split[4])
         plt.xlabel('x')
         plt.ylabel('√x')
         plt.grid()
